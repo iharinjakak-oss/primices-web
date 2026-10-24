@@ -3,6 +3,10 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { logout } from '../actions/auth'
 
+
+export const instant = false
+
+
 export default async function DashboardPage() {
   const cookieStore = await cookies()
   const token = cookieStore.get('token')?.value

@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { createUser, deleteUser } from '../../actions/users'
 
 type User = { id: number; name: string; email: string; role: string }
+export const instant = false
 
 export default async function UsersPage({
   searchParams,
