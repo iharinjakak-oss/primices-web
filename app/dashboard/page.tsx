@@ -1,47 +1,48 @@
-import { cookies } from 'next/headers'
-import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { logout } from '../actions/auth'
-
+import { getCurrentUser, roleLabels } from '../lib/session'
 
 export const instant = false
 
+function InfoCard({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-md">
+      <p className="text-sm text-gray-500">{label}</p>
+      <p className="mt-1 truncate text-lg font-semibold">{value}</p>
+    </div>
+  )
+}
 
 export default async function DashboardPage() {
-  const cookieStore = await cookies()
-  const token = cookieStore.get('token')?.value
-  if (!token) {
-    redirect('/login')
-  }
-
-  const res = await fetch(`${process.env.API_URL}/me`, {
-    headers: { Accept: 'application/json', Authorization: `Bearer ${token}` },
-    cache: 'no-store',
-  })
-  if (!res.ok) {
-    redirect('/login')
-  }
-  const user = await res.json()
+  const user = await getCurrentUser()
+  const isAdmin = user.role !== 'user'
 
   return (
-    <main className="min-h-screen bg-zinc-100 p-8 text-black">
-      <div className="mx-auto max-w-2xl space-y-4 rounded bg-white p-6 shadow">
-        <h1 className="text-2xl font-semibold">Tableau de bord</h1>
-        <p>Connecté en tant que <strong>{user.name}</strong> ({user.email})</p>
-        <p>Rôle : <strong>{user.role}</strong></p>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-semibold">Bonjour, {user.name}</h1>
+        <p className="text-sm text-gray-600">Bienvenue sur votre espace Primices.</p>
+      </div>
 
-        {user.role !== 'user' && (
-          <Link href="/dashboard/users" className="inline-block underline">
+      <div className="grid gap-6 md:grid-cols-3">
+        <InfoCard label="Rôle" value={roleLabels[user.role]} />
+        <InfoCard label="Adresse email" value={user.email} />
+        <InfoCard label="Identifiant" value={`#${user.id}`} />
+      </div>
+
+      {isAdmin && (
+        <section className="rounded-2xl border border-gray-100 bg-white p-6 shadow-md">
+          <h2 className="text-lg font-semibold">Administration</h2>
+          <p className="mt-1 text-sm text-gray-600">
+            Consultez, créez, modifiez et supprimez les comptes des utilisateurs.
+          </p>
+          <Link
+            href="/dashboard/users"
+            className="mt-4 inline-flex items-center justify-center rounded-md bg-[#1A2240] px-6 py-2 font-medium text-white transition hover:bg-[#314077]"
+          >
             Gérer les utilisateurs
           </Link>
-        )}
-
-        <form action={logout}>
-          <button type="submit" className="rounded bg-black px-4 py-2 text-white">
-            Se déconnecter
-          </button>
-        </form>
-      </div>
-    </main>
+        </section>
+      )}
+    </div>
   )
 }

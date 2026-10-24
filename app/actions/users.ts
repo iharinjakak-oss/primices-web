@@ -61,3 +61,40 @@ export async function deleteUser(formData: FormData) {
 
   redirect('/dashboard/users')
 }
+
+
+export async function updateUser(formData: FormData) {
+  const token = await getToken()
+  const id = String(formData.get('id') ?? '')
+
+  const res = await fetch(`${process.env.API_URL}/users/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      name: String(formData.get('name') ?? ''),
+      email: String(formData.get('email') ?? ''),
+      password: String(formData.get('password') ?? ''),
+      role: String(formData.get('role') ?? 'user'),
+    }),
+    cache: 'no-store',
+  })
+
+  if (res.status === 401) {
+    redirect('/login')
+  }
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => null)
+    const firstError = data?.errors ? (Object.values(data.errors)[0] as string[])[0] : null
+    redirect(
+      `/dashboard/users/${id}/edit?error=` +
+        encodeURIComponent(firstError ?? data?.message ?? 'Modification impossible.')
+    )
+  }
+
+  redirect('/dashboard/users')
+}
