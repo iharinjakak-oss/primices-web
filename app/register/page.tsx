@@ -14,8 +14,7 @@ export default function RegisterPage({
   searchParams: Promise<{ error?: string }>
 }) {
   return (
-    <AuthShell title="Créer votre compte">
-      <form action={register} className="space-y-6">
+    <AuthShell title="Créer votre compte" variant="centered">      <form action={register} className="space-y-6">
         <div className="space-y-1.5">
           <label htmlFor="name" className="block text-sm font-medium">
             Nom complet
