@@ -10,13 +10,13 @@ import DeleteButton from './delete-button'
 export const instant = false
 
 const badge: Record<Role, string> = {
-  super_admin: 'bg-[#1A2240] text-white',
+  super_admin: 'bg-[color:var(--dash-primary)] text-white',
   admin: 'bg-blue-100 text-blue-800',
   user: 'bg-gray-100 text-gray-700',
 }
 
 const fieldClass =
-  'block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder:text-gray-400 focus:border-[#1A2240] focus:outline-none'
+  'block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder:text-gray-400 focus:border-[color:var(--dash-primary)] focus:outline-none'
 
 export default async function UsersPage({
   searchParams,
@@ -65,7 +65,7 @@ export default async function UsersPage({
         <FormError searchParams={searchParams} />
       </Suspense>
 
-      <section className="rounded-2xl border border-gray-100 bg-white p-6 shadow-md">
+      <section className="rounded-xl bg-white p-6 shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
@@ -91,7 +91,7 @@ export default async function UsersPage({
                       {canEdit(u) && (
                         <Link
                           href={`/dashboard/users/${u.id}/edit`}
-                          className="text-sm font-medium text-[#1A2240] hover:underline"
+                          className="text-sm font-medium text-[color:var(--dash-primary)] hover:underline"
                         >
                           Modifier
                         </Link>
@@ -106,7 +106,7 @@ export default async function UsersPage({
         </div>
       </section>
 
-      <section className="rounded-2xl border border-gray-100 bg-white p-6 shadow-md">
+      <section className="rounded-xl bg-white p-6 shadow-sm">
         <h2 className="text-lg font-semibold">Créer un utilisateur</h2>
 
         <form action={createUser} className="mt-4 grid gap-4 md:grid-cols-2">
@@ -127,7 +127,7 @@ export default async function UsersPage({
           <div className="md:col-span-2">
             <button
               type="submit"
-              className="rounded-md bg-[#1A2240] px-6 py-2 font-medium text-white transition hover:bg-[#314077]"
+              className="rounded-md bg-[color:var(--dash-primary)] px-6 py-2 font-medium text-white transition hover:opacity-90"
             >
               Créer
             </button>

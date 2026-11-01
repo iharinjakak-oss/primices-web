@@ -9,7 +9,7 @@ import { getCurrentUser, getToken, type User } from '../../../../lib/session'
 export const instant = false
 
 const fieldClass =
-  'block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder:text-gray-400 focus:border-[#1A2240] focus:outline-none'
+  'block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder:text-gray-400 focus:border-[color:var(--dash-primary)] focus:outline-none'
 
 export default async function EditUserPage({
   params,
@@ -59,7 +59,7 @@ export default async function EditUserPage({
 
       <form
         action={updateUser}
-        className="space-y-5 rounded-2xl border border-gray-100 bg-white p-6 shadow-md"
+        className="space-y-5 rounded-xl bg-white p-6 shadow-sm"
       >
         <input type="hidden" name="id" value={target.id} />
 
@@ -119,7 +119,7 @@ export default async function EditUserPage({
         <div className="flex items-center gap-4">
           <button
             type="submit"
-            className="rounded-md bg-[#1A2240] px-6 py-2 font-medium text-white transition hover:bg-[#314077]"
+            className="rounded-md bg-[color:var(--dash-primary)] px-6 py-2 font-medium text-white transition hover:opacity-90"
           >
             Enregistrer
           </button>
