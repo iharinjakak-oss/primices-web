@@ -9,6 +9,7 @@ export type User = {
   name: string
   email: string
   role: Role
+  created_at?: string
 }
 
 export const roleLabels: Record<Role, string> = {

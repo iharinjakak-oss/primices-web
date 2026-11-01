@@ -4,3 +4,13 @@ html {
   font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   line-height: 1.5;
 }
+:root {
+  --dash-primary: #1a2240;
+  --dash-primary-light: #ecf2ff;
+  --dash-bg: #f2f6fa;
+  --dash-text: #2a3547;
+  --dash-muted: #5a6a85;
+  --dash-success: #13deb9;
+  --dash-warning: #ffae1f;
+  --dash-danger: #fa896b;
+}
