@@ -2,6 +2,7 @@
 
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { describeError, NETWORK_ERROR } from '../lib/errors'
 
 async function saveToken(token: string) {
   const cookieStore = await cookies()
@@ -15,17 +16,17 @@ async function saveToken(token: string) {
   })
 }
 
-function firstMessage(data: unknown, fallback: string): string {
-  const body = data as { message?: string; errors?: Record<string, string[]> } | null
+function post(path: string, body: unknown) {
+  return fetch(`${process.env.API_URL}${path}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify(body),
+    cache: 'no-store',
+  })
+}
 
-  if (body?.errors) {
-    const first = Object.values(body.errors)[0]?.[0]
-    if (first) {
-      return first
-    }
-  }
-
-  return body?.message ?? fallback
+function field(formData: FormData, name: string) {
+  return String(formData.get(name) ?? '')
 }
 
 function fail(page: string, message: string): never {
@@ -33,24 +34,19 @@ function fail(page: string, message: string): never {
 }
 
 export async function login(formData: FormData) {
-  const email = String(formData.get('email') ?? '')
-  const password = String(formData.get('password') ?? '')
-
   let res: Response
   try {
-    res = await fetch(`${process.env.API_URL}/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify({ email, password }),
-      cache: 'no-store',
+    res = await post('/login', {
+      email: field(formData, 'email'),
+      password: field(formData, 'password'),
     })
   } catch {
-    fail('/login', 'Serveur injoignable')
+    fail('/login', NETWORK_ERROR)
   }
 
   if (!res.ok) {
     const data = await res.json().catch(() => null)
-    fail('/login', firstMessage(data, 'Connexion impossible.'))
+    fail('/login', describeError(res.status, data, 'Connexion impossible.'))
   }
 
   const data = await res.json()
@@ -61,24 +57,19 @@ export async function login(formData: FormData) {
 export async function register(formData: FormData) {
   let res: Response
   try {
-    res = await fetch(`${process.env.API_URL}/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify({
-        name: String(formData.get('name') ?? ''),
-        email: String(formData.get('email') ?? ''),
-        password: String(formData.get('password') ?? ''),
-        password_confirmation: String(formData.get('password_confirmation') ?? ''),
-      }),
-      cache: 'no-store',
+    res = await post('/register', {
+      name: field(formData, 'name'),
+      email: field(formData, 'email'),
+      password: field(formData, 'password'),
+      password_confirmation: field(formData, 'password_confirmation'),
     })
   } catch {
-    fail('/register', 'Serveur injoignable')
+    fail('/register', NETWORK_ERROR)
   }
 
   if (!res.ok) {
     const data = await res.json().catch(() => null)
-    fail('/register', firstMessage(data, 'Inscription impossible.'))
+    fail('/register', describeError(res.status, data, 'Inscription impossible.'))
   }
 
   const data = await res.json()

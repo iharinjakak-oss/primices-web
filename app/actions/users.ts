@@ -1,87 +1,48 @@
 'use server'
 
-import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { describeError, NETWORK_ERROR } from '../lib/errors'
+import { getToken } from '../lib/session'
 
-async function getToken() {
-  const cookieStore = await cookies()
-  const token = cookieStore.get('token')?.value
-  if (!token) {
-    redirect('/login')
+function call(method: string, path: string, token: string, body?: unknown) {
+  const headers: Record<string, string> = {
+    Accept: 'application/json',
+    Authorization: `Bearer ${token}`,
   }
-  return token
+  if (body) {
+    headers['Content-Type'] = 'application/json'
+  }
+
+  return fetch(`${process.env.API_URL}/users${path}`, {
+    method,
+    headers,
+    body: body ? JSON.stringify(body) : undefined,
+    cache: 'no-store',
+  })
 }
 
-function back(message: string): never {
-  redirect('/dashboard/users?error=' + encodeURIComponent(message))
+function field(formData: FormData, name: string) {
+  return String(formData.get(name) ?? '')
+}
+
+function back(page: string, message: string): never {
+  redirect(`${page}?error=${encodeURIComponent(message)}`)
 }
 
 export async function createUser(formData: FormData) {
   const token = await getToken()
 
-  const res = await fetch(`${process.env.API_URL}/users`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({
-      name: String(formData.get('name') ?? ''),
-      email: String(formData.get('email') ?? ''),
-      password: String(formData.get('password') ?? ''),
-      role: String(formData.get('role') ?? 'user'),
-    }),
-    cache: 'no-store',
-  })
-
-  if (!res.ok) {
-    const data = await res.json().catch(() => null)
-    const firstError = data?.errors ? (Object.values(data.errors)[0] as string[])[0] : null
-    back(firstError ?? data?.message ?? 'Création impossible.')
+  let res: Response
+  try {
+    res = await call('POST', '', token, {
+      name: field(formData, 'name'),
+      email: field(formData, 'email'),
+      password: field(formData, 'password'),
+      role: field(formData, 'role') || 'user',
+    })
+  } catch {
+    back('/dashboard/users', NETWORK_ERROR)
   }
-
-  redirect('/dashboard/users')
-}
-
-export async function deleteUser(formData: FormData) {
-  const token = await getToken()
-  const id = String(formData.get('id') ?? '')
-
-  const res = await fetch(`${process.env.API_URL}/users/${id}`, {
-    method: 'DELETE',
-    headers: { Accept: 'application/json', Authorization: `Bearer ${token}` },
-    cache: 'no-store',
-  })
-
-  if (!res.ok) {
-    const data = await res.json().catch(() => null)
-    back(data?.message ?? 'Suppression impossible.')
-  }
-
-  redirect('/dashboard/users')
-}
-
-
-export async function updateUser(formData: FormData) {
-  const token = await getToken()
-  const id = String(formData.get('id') ?? '')
-
-  const res = await fetch(`${process.env.API_URL}/users/${id}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({
-      name: String(formData.get('name') ?? ''),
-      email: String(formData.get('email') ?? ''),
-      password: String(formData.get('password') ?? ''),
-      role: String(formData.get('role') ?? 'user'),
-    }),
-    cache: 'no-store',
-  })
 
   if (res.status === 401) {
     redirect('/login')
@@ -89,11 +50,59 @@ export async function updateUser(formData: FormData) {
 
   if (!res.ok) {
     const data = await res.json().catch(() => null)
-    const firstError = data?.errors ? (Object.values(data.errors)[0] as string[])[0] : null
-    redirect(
-      `/dashboard/users/${id}/edit?error=` +
-        encodeURIComponent(firstError ?? data?.message ?? 'Modification impossible.')
-    )
+    back('/dashboard/users', describeError(res.status, data, 'Création impossible.'))
+  }
+
+  redirect('/dashboard/users')
+}
+
+export async function updateUser(formData: FormData) {
+  const token = await getToken()
+  const id = field(formData, 'id')
+  const editPage = `/dashboard/users/${id}/edit`
+
+  let res: Response
+  try {
+    res = await call('PUT', `/${id}`, token, {
+      name: field(formData, 'name'),
+      email: field(formData, 'email'),
+      password: field(formData, 'password'),
+      role: field(formData, 'role') || 'user',
+    })
+  } catch {
+    back(editPage, NETWORK_ERROR)
+  }
+
+  if (res.status === 401) {
+    redirect('/login')
+  }
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => null)
+    back(editPage, describeError(res.status, data, 'Modification impossible.'))
+  }
+
+  redirect('/dashboard/users')
+}
+
+export async function deleteUser(formData: FormData) {
+  const token = await getToken()
+  const id = field(formData, 'id')
+
+  let res: Response
+  try {
+    res = await call('DELETE', `/${id}`, token)
+  } catch {
+    back('/dashboard/users', NETWORK_ERROR)
+  }
+
+  if (res.status === 401) {
+    redirect('/login')
+  }
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => null)
+    back('/dashboard/users', describeError(res.status, data, 'Suppression impossible.'))
   }
 
   redirect('/dashboard/users')
