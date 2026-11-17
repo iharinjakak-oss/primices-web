@@ -1,47 +1,59 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { UserIcon } from './icons'
 import MobileMenu from './mobile-menu'
 
 const items = [
   { href: '/about-us', label: 'À propos' },
   { href: '/coaching', label: 'Programmes' },
   { href: '/testimonials', label: 'Témoignages' },
-  { href: '/faq', label: 'FAQ' },
+  { href: '/privacy-policy', label: 'Confidentialité' },
+  { href: '/blog', label: 'Blog' },
 ]
 
 export default function SiteHeader() {
   return (
-    <header className="relative bg-[color:var(--site-brand)] text-white">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+    <header className="relative bg-white shadow-sm">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         <Link href="/" className="flex items-center gap-3">
-          <span className="rounded-md bg-white p-1">
-            <Image src="/images/logo.svg" alt="" width={40} height={40} className="h-10 w-auto" />
-          </span>
-          <span className="text-sm font-bold leading-tight tracking-wide">
-            PRIMICES
-            <br />
-            INTERNATIONAL
+          <Image src="/images/logo.svg" alt="" width={48} height={48} className="h-12 w-auto" />
+          <span className="font-bold leading-tight tracking-widest">
+            <span className="block text-lg text-[color:var(--site-gold)]">PRIMICES</span>
+            <span className="block text-sm text-[color:var(--site-teal)]">INTERNATIONAL</span>
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-6 md:flex">
+        <nav className="hidden items-center gap-10 lg:flex">
           {items.map((item) => (
-            <Link key={item.href} href={item.href} className="text-sm hover:underline">
+            <Link
+              key={item.href}
+              href={item.href}
+              className="text-sm text-gray-700 transition hover:text-[color:var(--site-teal)]"
+            >
               {item.label}
             </Link>
           ))}
-          <Link href="/login" className="text-sm hover:underline">
-            Connexion
-          </Link>
+        </nav>
+
+        <div className="hidden items-center gap-3 lg:flex">
           <Link
             href="/contact"
-            className="rounded-md border border-white px-4 py-2 text-sm font-medium transition hover:bg-white hover:text-[color:var(--site-brand)]"
+            className="rounded-full bg-[color:var(--site-teal)] px-6 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
           >
             Contact
           </Link>
-        </nav>
+          <Link
+            href="/login"
+            aria-label="Connexion"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 text-gray-700 transition hover:border-[color:var(--site-teal)] hover:text-[color:var(--site-teal)]"
+          >
+            <UserIcon className="h-5 w-5" />
+          </Link>
+        </div>
 
-        <MobileMenu items={[...items, { href: '/login', label: 'Connexion' }, { href: '/contact', label: 'Contact' }]} />
+        <MobileMenu
+          items={[...items, { href: '/contact', label: 'Contact' }, { href: '/login', label: 'Connexion' }]}
+        />
       </div>
     </header>
   )

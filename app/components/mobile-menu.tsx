@@ -10,23 +10,27 @@ export default function MobileMenu({ items }: { items: Item[] }) {
   const [open, setOpen] = useState(false)
 
   return (
-    <div className="md:hidden">
+    <div className="lg:hidden">
       <button
         type="button"
         onClick={() => setOpen(!open)}
         aria-label={open ? 'Fermer le menu' : 'Ouvrir le menu'}
         aria-expanded={open}
-        className="text-white"
+        className="text-gray-900"
       >
         {open ? <CloseIcon className="h-7 w-7" /> : <MenuIcon className="h-7 w-7" />}
       </button>
 
       {open && (
-        <nav className="absolute left-0 right-0 top-full z-20 bg-[color:var(--site-brand)] px-6 py-4 shadow-lg">
+        <nav className="absolute left-0 right-0 top-full z-20 border-t border-gray-100 bg-white px-6 py-4 shadow-lg">
           <ul className="space-y-3">
             {items.map((item) => (
               <li key={item.href}>
-                <Link href={item.href} onClick={() => setOpen(false)} className="block py-1 text-white">
+                <Link
+                  href={item.href}
+                  onClick={() => setOpen(false)}
+                  className="block py-1 text-gray-900"
+                >
                   {item.label}
                 </Link>
               </li>

@@ -1,38 +1,62 @@
-import type { Metadata } from 'next'
-import CtaBand from '@/app/components/cta-band'
+import Closing from '@/app/components/home/closing'
+import FeatureSection from '@/app/components/home/feature-section'
+import Hero from '@/app/components/home/hero'
 import Steps from '@/app/components/home/steps'
-import PageHero from '@/app/components/page-hero'
-import ProgramCard from '@/app/components/program-card'
-import Section from '@/app/components/section'
-import { cta, images, programsPage as page } from '../pages-content'
+import { cta, home, images } from './pages-content'
 
-export const metadata: Metadata = {
-  title: page.title,
-  description: page.description,
-}
-
-export default function CoachingPage() {
+export default function HomePage() {
   return (
     <>
-      <PageHero title={page.title} intro={page.intro} image={images.page} />
+      <Hero
+        title={home.hero.title}
+        subtitle={home.hero.subtitle}
+        cta={cta}
+        stats={home.stats}
+        testimonial={home.testimonial}
+        image={images.hero}
+      />
 
-      <Section title={page.sectionTitle} soft>
-        <div className="grid gap-6 md:grid-cols-3">
-          {page.programs.map((program) => (
-            <ProgramCard
-              key={program.name}
-              name={program.name}
-              description={program.description}
-              points={program.points}
-              cta={cta}
-            />
-          ))}
-        </div>
-      </Section>
+      <FeatureSection
+        title={home.guide.title}
+        subtitle={home.guide.subtitle}
+        points={home.guide.points}
+        cta={cta}
+        image={images.guide}
+        soft
+      />
 
-      <Steps title={page.steps.title} subtitle={page.steps.subtitle} items={page.steps.items} />
+      <FeatureSection
+        title={home.life.title}
+        subtitle={home.life.subtitle}
+        points={home.life.points}
+        cta={cta}
+      />
 
-      <CtaBand title={page.closing.title} text={page.closing.text} cta={cta} />
+      <FeatureSection
+        title={home.questions.title}
+        subtitle={home.questions.subtitle}
+        points={home.questions.points}
+        cta={cta}
+        columns
+        soft
+      />
+
+      <FeatureSection
+        title={home.balance.title}
+        subtitle={home.balance.subtitle}
+        points={home.balance.points}
+        cta={cta}
+      />
+
+      <Steps title={home.steps.title} subtitle={home.steps.subtitle} items={home.steps.items} />
+
+      <Closing
+        title={home.closing.title}
+        subtitle={home.closing.subtitle}
+        text={home.closing.text}
+        cta={cta}
+        image={images.closing}
+      />
     </>
   )
 }
